@@ -769,51 +769,39 @@ function toggleAuth(type) {
     document.getElementById('signupBox').style.display = type === 'signup' ? 'flex' : 'none';
 }
 
-async function handleSignup() {
+function handleSignup() {
     const id = document.getElementById('signupId').value.trim();
     const name = document.getElementById('signupName').value.trim();
     const pw = document.getElementById('signupPw').value.trim();
 
     if(!id || !name || !pw) { alert("모든 항목을 입력해주세요."); return; }
 
-    // PHP 서버로 데이터 전송
-    const response = await fetch('signup.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, name: name, password: pw })
-    });
-    
-    const result = await response.json();
+    let userDB = JSON.parse(localStorage.getItem('instaUserDB')) || {};
+    if(userDB[id]) { alert("이미 존재하는 아이디입니다."); return; }
 
-    if(result.status === "success") {
-        alert("회원가입이 완료되었습니다! 로그인해주세요.");
-        toggleAuth('login');
-    } else {
-        alert("회원가입 실패: " + result.message);
-    }
+    userDB[id] = { password: pw, name: name, bio: "천안상업고등학교 학생", pic: "" };
+    localStorage.setItem('instaUserDB', JSON.stringify(userDB));
+
+    alert("회원가입이 완료되었습니다! 로그인해주세요.");
+    toggleAuth('login');
 }
 
-async function handleLogin() {
+function handleLogin() {
     const id = document.getElementById('loginId').value.trim();
     const pw = document.getElementById('loginPw').value.trim();
 
     if(!id || !pw) { alert("아이디와 비밀번호를 입력해주세요."); return; }
 
-    const response = await fetch('login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, password: pw })
-    });
+    let userDB = JSON.parse(localStorage.getItem('instaUserDB')) || {};
+    const user = userDB[id];
 
-    const result = await response.json();
-
-    if(result.status === "success") {
-        localStorage.setItem('loggedInUser', id); // 로그인 유지용 세션 대체
-        alert(`${result.user.name}님 환영합니다!`);
-        location.reload(); 
-    } else {
-        alert("아이디 또는 비밀번호가 일치하지 않습니다."); 
+    if(!user || user.password !== pw) {
+        alert("아이디 또는 비밀번호가 일치하지 않습니다."); return;
     }
+
+    localStorage.setItem('loggedInUser', id);
+    alert(`${user.name}님 환영합니다!`);
+    location.reload(); 
 }
 
 function checkLoginStatus() {
