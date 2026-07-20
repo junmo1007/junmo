@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>천안상고 PC 인스타그램 & 챗봇</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="auth-container" class="auth-wrapper">
+        <div class="auth-box" id="loginBox">
+            <h1 class="auth-logo">S-Log</h1>
+            <input type="text" id="loginId" placeholder="사용자 이름 (ID)">
+            <input type="password" id="loginPw" placeholder="비밀번호" onkeypress="if(event.key==='Enter') handleLogin();">
+            <button class="auth-btn" onclick="handleLogin()">로그인</button>
+            <div class="auth-switch">계정이 없으신가요? <span onclick="toggleAuth('signup')">가입하기</span></div>
+        </div>
+
+        <div class="auth-box" id="signupBox" style="display: none;">
+            <h1 class="auth-logo">S-log</h1>
+            <p style="color: #8e8e8e; text-align: center; margin-bottom: 15px; font-weight: 600; font-size: 14px;">친구들의 사진과 동영상을 보려면 가입하세요.</p>
+            <input type="text" id="signupId" placeholder="사용자 이름 (ID)">
+            <input type="text" id="signupName" placeholder="성명">
+            <input type="password" id="signupPw" placeholder="비밀번호">
+            <button class="auth-btn" onclick="handleSignup()">가입</button>
+            <div class="auth-switch">계정이 있으신가요? <span onclick="toggleAuth('login')">로그인</span></div>
+        </div>
+    </div>
+
+    <!-- 사이드바 영역 -->
+    <nav class="sidebar">
+        <a href="index.html" class="sidebar-logo">
+            <div class="nav-icon">
+                <img id="mainLogo" src="로고/logo-b.png" alt="상고로그">
+            </div>
+            <span class="nav-text" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-style: italic; font-size: 22px; font-weight: bold;">S-Log</span>
+        </a>
+
+        <div class="nav-menu">
+            <div id="nav-home" class="nav-item active" onclick="switchTab('home', this)">
+                <span class="nav-icon">🏠</span> <span class="nav-text">홈</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('search', this)">
+                <span class="nav-icon">🔍</span> <span class="nav-text">검색</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('reels', this)">
+                <span class="nav-icon">🎬</span> <span class="nav-text">릴스</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('chatbot', this)">
+                <span class="nav-icon">🤖</span> <span class="nav-text">AI 챗봇</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('lunch', this)">
+                <span class="nav-icon">🍚</span> <span class="nav-text">급식표</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('timetable', this)">
+                <span class="nav-icon">📅</span> <span class="nav-text">시간표</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', this)">
+                <span class="nav-icon">👤</span> <span class="nav-text">프로필</span>
+            </div>
+        </div>
+        
+        <div class="nav-item" style="margin-top: auto; margin-bottom: 20px;" onclick="openMoreMenu()">
+            <span class="nav-icon">☰</span> <span class="nav-text">더 보기</span>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <!-- 1. 홈 화면 -->
+        <div id="view-home" class="tab-view active">
+            <div class="home-container">
+                <div class="feed-area" id="homeFeedArea">
+                    <!-- 자바스크립트가 슬라이드 구조로 게시물을 덮어씌웁니다 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 검색 화면 (누락된 닫는 태그 수정 완료) -->
+        <!-- 2. 검색 화면 -->
+        <div id="view-search" class="tab-view">
+            <div class="explore-container">
+                <div class="search-bar-container">
+                    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 사용자 이름 또는 ID 검색..." onkeyup="handleSearch()">
+                </div>
+                <div id="searchResults" style="display: none; flex-direction: column; gap: 10px; margin-top: 20px; padding: 10px;"></div>
+            </div> <!-- ✨ 이 닫는 태그가 누락되어 모든 문제가 발생했습니다! -->
+        </div>
+
+        <!-- 3. 릴스 화면 구역 -->
+        <div id="view-reels" class="tab-view" style="padding: 0;">
+            <div class="reels-container" id="reelsContainer" onscroll="handleReelsScroll()">
+                <!-- 자바스크립트가 여기에 릴스 영상들을 무한으로 추가해 줍니다 -->
+            </div>
+        </div>
+
+        <!-- 4. AI 챗봇 화면 -->
+        <div id="view-chatbot" class="tab-view">
+            <div class="chat-wrapper">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-header-left">
+                            <div class="chat-bot-icon">🏫</div>
+                            <div>
+                                <div style="font-size: 16px;">AI 천안상고 도우미</div>
+                                <div style="font-size: 12px; color: #8e8e8e; font-weight: normal;">무엇이든 물어보세요!</div>
+                            </div>
+                        </div>
+                        <div class="chat-header-actions">
+                            <button class="action-btn" onclick="toggleHistory()">🕒 기록</button>
+                            <button class="action-btn reset" onclick="resetChat()">🔄 초기화</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-box" id="chatBox">
+                        <div class="message bot-message">
+                            <div class="chat-bot-icon" style="width:30px; height:30px; font-size:14px;">🏫</div>
+                            <div class="message-text">안녕하세요! 천안상고 AI 챗봇입니다.<br>급식, 학과 정보, 교칙 등 궁금한 점을 메시지로 보내주세요!</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-replies" style="display: flex; gap: 8px; padding: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #eee;">
+    <button class="quick-reply-btn" onclick="sendQuickMsg('천안상고의 교훈이 뭐야?')" style="padding: 8px 12px; border: 1px solid #dbdbdb; border-radius: 20px; background: #fff; cursor: pointer; font-size: 13px;">🏫 학교 교훈</button>
+    <button class="quick-reply-btn" onclick="sendQuickMsg('소프트웨어개발과는 어떤 학과야?')" style="padding: 8px 12px; border: 1px solid #dbdbdb; border-radius: 20px; background: #fff; cursor: pointer; font-size: 13px;">💻 소프트웨어과 정보</button>
+</div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="userInput" placeholder="메시지 입력..." onkeypress="if(event.key==='Enter') sendMessage();">
+                        <button onclick="sendMessage()">보내기</button>
+                    </div>
+
+                    <div class="chat-history-panel" id="historyPanel">
+                        <div class="history-panel-header">
+                            <span>💬 이전 대화 기록</span>
+                            <span style="cursor: pointer; font-size: 24px; color: #8e8e8e; line-height: 1;" onclick="toggleHistory()">&times;</span>
+                        </div>
+                        <div class="history-list" id="historyList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 급식표 화면 -->
+        <div id="view-lunch" class="tab-view">
+            <div class="lunch-container">
+                <div class="lunch-header">
+                    <span>🍚</span> 2026년 7월 식단표 <span>🍚</span>
+                </div>
+                
+                <div class="lunch-table-wrapper">
+                    <table class="monthly-lunch-table">
+                        <thead>
+                            <tr>
+                                <th>월요일</th>
+                                <th>화요일</th>
+                                <th>수요일</th>
+                                <th>목요일</th>
+                                <th>금요일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="empty"><div class="date-cell">-</div><div class="menu-cell">-</div></td>
+                                <td class="empty"><div class="date-cell">-</div><div class="menu-cell">-</div></td>
+                                <td class="empty"><div class="date-cell">1일</div><div class="menu-cell">-</div></td>
+                                <td class="empty"><div class="date-cell">2일</div><div class="menu-cell">-</div></td>
+                                <td class="empty"><div class="date-cell">3일</div><div class="menu-cell">-</div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="date-cell">6일</div>
+                                    <div class="menu-cell">혼합10곡밥<br>제주식밀면<br>코다리무조림<br>계란장조림<br>숙주무침<br>배추김치<br>우유</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">7일</div>
+                                    <div class="menu-cell">홍국쌀밥<br>김치찌개<br>골뱅이무침<br>치킨커틀렛<br>깍두기<br>양배추샐러드</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">8일</div>
+                                    <div class="menu-cell">마늘종비빔밥<br>계란파국<br>통살등심꼬치<br>백김치<br>꿀토마토<br>요구르트</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">9일</div>
+                                    <div class="menu-cell">수수밥<br>근대된장국<br>단무지무침<br>오삼불고기<br>총각김치<br>옥수수콘치즈</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">10일</div>
+                                    <div class="menu-cell">서리태콩밥<br>미니냉면<br>콩나물무침<br>티본스테이크<br>배추김치<br>알감자버터구이</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="date-cell">13일</div>
+                                    <div class="menu-cell">건강 귀리밥<br>간장비빔국수<br>오이냉국<br>묵은지닭찜<br>청포묵김무침<br>쥐어채무침</div>
+                                </td>
+                                <!-- 14일 추가 부분 -->
+                                <td>
+                                    <div class="date-cell">14일 (오늘)</div>
+                                    <div class="menu-cell">영양 흑미밥<br>얼갈이배추된장국<br>양배추찜<br>아삭고추무침<br>어묵볶음<br>돈목살구이<br>보쌈김치</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">15일</div>
+                                    <div class="menu-cell">든든한 찹쌀밥<br>닭다리삼계탕<br>무말랭이무침<br>석박지<br>초코칩파이<br>제철 수박</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">16일</div>
+                                    <div class="menu-cell">하얀 쌀밥<br>따끈한 설렁탕<br>노각생채<br>분모자떡볶이<br>오징어튀김<br>깍두기</div>
+                                </td>
+                                <td class="empty">
+                                    <div class="date-cell">17일</div>
+                                    <div class="menu-cell">-</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="today">
+                                    <div class="date-cell">20일</div>
+                                    <div class="menu-cell">새우볶음밥<br>짜장소스<br>꼬치어묵국<br>콘샐러드<br>찹스테이크<br>단무지</div>
+                                </td>
+                                <td>
+                                    <div class="date-cell">21일</div>
+                                    <div class="menu-cell">까르보나라<br>치킨텐더<br>조각피자<br>오렌지쥬스<br>오이피클</div>
+                                </td>
+                                <td class="empty"><div class="date-cell">22일</div><div class="menu-cell">방학식</div></td>
+                                <td class="empty"><div class="date-cell">23일</div><div class="menu-cell">-</div></td>
+                                <td class="empty"><div class="date-cell">24일</div><div class="menu-cell">-</div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. 시간표 화면 -->
+        <div id="view-timetable" class="tab-view">
+            <div class="timetable-container">
+                <h2 id="timetableTitle" style="text-align: center; margin-bottom: 20px;">🗓️ 학급 시간표 (1학년 1반)</h2>
+                
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <select id="gradeSelect" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #dbdbdb; outline: none; font-size: 15px;">
+                        <option value="1">1학년</option>
+                        <option value="2">2학년</option>
+                        <option value="3">3학년</option>
+                    </select>
+                    <input type="number" id="classInput" value="1" min="1" max="20" placeholder="반" style="padding: 8px; width: 70px; border-radius: 8px; border: 1px solid #dbdbdb; outline: none; text-align: center; font-size: 15px;">
+                    <button onclick="updateTimetable()" style="padding: 8px 16px; background: #0095f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s;">조회</button>
+                </div>
+
+                <table class="timetable-table">
+                    <thead><tr><th>교시</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th></tr></thead>
+                    <tbody>
+                        <!-- 자바스크립트가 여기에 시간표를 채웁니다 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. 프로필 탭 화면 -->
+        <div id="view-profile" class="tab-view">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar-container">
+                        <div class="profile-pic-large" id="displayPic"></div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-title-row">
+                            <span id="displayUsername" class="username">baguju09</span>
+                            
+                            <button id="btnFollow" class="profile-action-btn blue" style="display:none;" onclick="toggleFollow()">팔로우</button>
+                            <button id="btnMessage" class="profile-action-btn" style="display:none;" onclick="alert('메시지 보내기 기능은 준비중입니다!')">메시지 보내기</button>
+                            
+                            <!-- ⚙️ 새롭게 변경된 프로필 편집 / 설정 버튼 -->
+                            <button id="btnEditProfile" class="profile-action-btn" onclick="openSettings()">프로필 편집</button>
+                        </div>
+                        <div class="profile-stats">
+                            <span>게시물 <strong>0</strong></span>
+                            <span style="cursor:pointer;" onclick="openFollowList('followers')">팔로워 <strong id="statFollowers">0</strong></span>
+                            <span style="cursor:pointer;" onclick="openFollowList('following')">팔로우 <strong id="statFollowing">0</strong></span>
+                        </div>
+                        <!-- 이름 및 소개글 -->
+                        <div class="profile-bio-section" style="align-items: flex-start; text-align: left;">
+                            <div id="displayName" class="display-name">바구주</div>
+                            <div id="displayBio" class="profile-category" style="margin-top: 5px;">천안상업고등학교 학생</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 40px; margin-top: 40px; margin-bottom: 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid #dbdbdb; padding: 4px; display: flex; justify-content: center; align-items: center;">
+                            <div style="width: 100%; height: 100%; border-radius: 50%; background-color: #fafafa; display: flex; justify-content: center; align-items: center; font-size: 28px;">🏫</div>
+                        </div>
+                        <span style="font-size: 13px; font-weight: 600;">학교생활</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid #dbdbdb; padding: 4px; display: flex; justify-content: center; align-items: center;">
+                            <div style="width: 100%; height: 100%; border-radius: 50%; background-color: #fafafa; display: flex; justify-content: center; align-items: center; font-size: 28px;">💻</div>
+                        </div>
+                        <span style="font-size: 13px; font-weight: 600;">프로젝트</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid #dbdbdb; padding: 4px; display: flex; justify-content: center; align-items: center;">
+                            <div style="width: 100%; height: 100%; border-radius: 50%; background-color: #fafafa; display: flex; justify-content: center; align-items: center; font-size: 28px;">🎮</div>
+                        </div>
+                        <span style="font-size: 13px; font-weight: 600;">취미</span>
+                    </div>
+                </div>
+
+                <div style="width: 100%; border-top: 1px solid #dbdbdb; display: flex; justify-content: center; gap: 50px; padding-top: 15px; margin-top: 40px; font-size: 13px; font-weight: bold; color: #8e8e8e;">
+                    <span style="color: #262626; border-top: 1px solid #262626; padding-top: 10px; margin-top: -16px;">▦ 게시물</span>
+                    <span>태그됨</span>
+                </div>
+                
+                <div style="text-align:center; padding: 60px 0; color: #262626; display: flex; flex-direction: column; align-items: center;">
+                    <div style="width: 60px; height: 60px; border: 2px solid #262626; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 30px;">📷</span>
+                    </div>
+                    <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 15px;">사진 공유</h2>
+                    <p style="font-size: 14px; color: #8e8e8e;">사진을 공유하면 회원님의 프로필에 표시됩니다.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 8. 새로운 설정 및 프로필 편집 탭 (전체 화면 뷰) -->
+        <div id="view-settings" class="tab-view">
+            <div class="settings-container">
+                <h2 class="settings-main-title">프로필 편집</h2>
+
+                <!-- 프로필 사진 및 계정 요약 박스 -->
+                <div class="settings-profile-box">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div id="settingsPreviewPic" class="settings-avatar"></div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span id="settingsDisplayId" style="font-weight: bold; font-size: 16px;"></span>
+                            <span id="settingsDisplayName" style="color: #8e8e8e; font-size: 14px;"></span>
+                        </div>
+                    </div>
+                    <button class="settings-btn-blue" onclick="document.getElementById('settingsPicUpload').click()">사진 변경</button>
+                    <input type="file" id="settingsPicUpload" accept="image/*" style="display: none;" onchange="previewSettingsPic(this)">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #dbdbdb; margin: 30px 0;">
+
+                <!-- 보안 인가 (아이디/비번 변경 시 필수) -->
+                <div class="settings-form-group">
+                    <label>현재 비밀번호 <span style="color:#ed4956; font-size: 12px; font-weight:normal;">* 아이디/비밀번호 변경 시 필수 입력</span></label>
+                    <input type="password" id="settingsCurrentPw" placeholder="현재 비밀번호">
+                </div>
+
+                <!-- 계정 정보 수정 -->
+                <div class="settings-form-group">
+                    <label>새 아이디</label>
+                    <input type="text" id="settingsNewId" placeholder="변경할 아이디 입력 (선택)">
+                </div>
+                
+                <div class="settings-form-group">
+                    <label>새 비밀번호</label>
+                    <input type="password" id="settingsNewPw" placeholder="변경할 비밀번호 입력 (선택)">
+                </div>
+
+                <div class="settings-form-group">
+                    <label>이름</label>
+                    <input type="text" id="settingsName" placeholder="표시되는 이름">
+                </div>
+
+                <div class="settings-form-group">
+                    <label>소개</label>
+                    <textarea id="settingsBio" placeholder="자신을 표현해보세요!"></textarea>
+                    <div class="settings-char-count">150자 이내</div>
+                </div>
+
+                <!-- 저장 및 취소 버튼 -->
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                    <button class="settings-btn-cancel" onclick="switchTab('profile')">취소</button>
+                    <button class="settings-btn-save" onclick="saveProfileSettings()">제출</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================
+             모달(팝업) 창 모음 
+             ========================= -->
+        <!-- 프로필 팝업 메뉴 -->
+        <div id="profileSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1100; justify-content:center; align-items:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; width:300px; display:flex; flex-direction:column; overflow:hidden;">
+                <button class="menu-btn-item" onclick="closeProfileSettings(); openSettings();">설정 및 개인정보</button>
+                <button class="menu-btn-item logout-btn" onclick="handleLogout()">로그아웃</button>
+                <button class="menu-btn-item cancel-btn" onclick="closeProfileSettings()">취소</button>
+            </div>
+        </div>
+
+        <!-- 사이드바 더보기 메뉴 -->
+        <div id="moreMenuModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1100; justify-content:center; align-items:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; width:300px; display:flex; flex-direction:column; overflow:hidden;">
+                <button class="menu-btn-item" onclick="closeMoreMenu(); openSettings();">설정 및 개인정보</button>
+                <button class="menu-btn-item" onclick="handleAccountSwitch()">계정 전환</button>
+                <button class="menu-btn-item" onclick="toggleDarkMode(); closeMoreMenu()">모드 전환 (다크/라이트)</button>
+                <button class="menu-btn-item logout-btn" onclick="handleLogout()">로그아웃</button>
+                <button class="menu-btn-item cancel-btn" onclick="closeMoreMenu()">취소</button>
+            </div>
+        </div>
+
+        <!-- 팔로워 리스트 모달 -->
+        <div id="followListModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1200; justify-content:center; align-items:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; width:400px; height: 400px; display:flex; flex-direction:column; overflow:hidden;">
+                <div style="padding: 15px; border-bottom: 1px solid #dbdbdb; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="width: 24px;"></div>
+                    <h3 id="followListTitle" style="font-size: 16px; margin: 0;">팔로워</h3>
+                    <span style="font-size: 28px; cursor: pointer; line-height: 1; margin-top: -4px;" onclick="closeFollowList()">&times;</span>
+                </div>
+                <div id="followListContainer" style="padding: 15px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 15px;">
+                    <!-- JS로 채워짐 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 릴스 댓글 모달 -->
+        <div id="reelCommentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; width:400px; height: 500px; display:flex; flex-direction:column; overflow:hidden;">
+                <div style="padding: 15px; border-bottom: 1px solid #dbdbdb; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="width: 24px;"></div>
+                    <h3 style="font-size: 16px; margin: 0;">댓글</h3>
+                    <span style="font-size: 28px; cursor: pointer; line-height: 1; margin-top: -4px;" onclick="closeReelComments()">&times;</span>
+                </div>
+                
+                <div id="reelCommentList" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+                </div>
+                
+                <div style="padding: 15px; border-top: 1px solid #dbdbdb; display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="reelCommentInput" placeholder="댓글 달기..." style="flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #dbdbdb; outline: none; font-size:14px;" onkeypress="if(event.key==='Enter') submitReelComment();">
+                    <button onclick="submitReelComment()" style="background: none; border: none; color: #0095f6; font-weight: bold; cursor: pointer; font-size:14px;">게시</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 피드 댓글 모달 -->
+        <div id="feedCommentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; width:400px; height: 500px; display:flex; flex-direction:column; overflow:hidden;">
+                <div style="padding: 15px; border-bottom: 1px solid #dbdbdb; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="width: 24px;"></div>
+                    <h3 style="font-size: 16px; margin: 0;">댓글</h3>
+                    <span style="font-size: 28px; cursor: pointer; line-height: 1; margin-top: -4px;" onclick="closeFeedComments()">&times;</span>
+                </div>
+                
+                <div id="feedCommentList" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+                </div>
+                
+                <div style="padding: 15px; border-top: 1px solid #dbdbdb; display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="feedCommentInput" placeholder="댓글 달기..." style="flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #dbdbdb; outline: none; font-size:14px;" onkeypress="if(event.key==='Enter') submitFeedComment();">
+                    <button onclick="submitFeedComment()" style="background: none; border: none; color: #0095f6; font-weight: bold; cursor: pointer; font-size:14px;">게시</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
