@@ -1,7 +1,7 @@
 <?php
-$host = "RDS_엔드포인트_주소"; // 예: mydb.xxxx.ap-northeast-2.rds.amazonaws.com
-$user = "마스터사용자명";
-$pw = "비밀번호";
+$host = "junmo.chmamsqk8trk.ap-northeast-3.rds.amazonaws.com"; // 예: mydb.xxxx.ap-northeast-2.rds.amazonaws.com
+$user = "admin";
+$pw = "jjunmo08!!";
 $dbName = "slog_db";
 
 $conn = new mysqli($host, $user, $pw, $dbName);
